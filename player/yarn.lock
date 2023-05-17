@@ -7593,10 +7593,10 @@ react-scripts@5.0.1:
   optionalDependencies:
     fsevents "^2.3.2"
 
-react-video-player-extended@^8.0.0:
-  version "8.3.0"
-  resolved "https://registry.yarnpkg.com/react-video-player-extended/-/react-video-player-extended-8.3.0.tgz#71880d8eb63735aa08f3eb9a0063071f0fd3784b"
-  integrity sha512-0/xBedatg41zqIP/UOQE9o4RlrCTDQjMMBZt+E0b5STFf4b9M2g7t0gK1cIgbJIV9w//1gVUayrAkHAh0PbvuA==
+react-video-player-extended@7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/react-video-player-extended/-/react-video-player-extended-7.0.0.tgz#f6846eff909b57845c87eaa0f570f81c4c06f474"
+  integrity sha512-l6NhB+xs5BdOQaKSgqV3EvapBJdw6JvQYuSDzWMXXPdz7kYNdGUlyskX/CFpKrPtzDA/KU5+PSJ/0EMbiVI6IQ==
 
 react@^18.2.0:
   version "18.2.0"
