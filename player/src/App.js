@@ -27,6 +27,7 @@ function App() {
         onPlay={onPlay}
         onPause={onPause}
         onVolume={onVolume}
+        onProgress={() => {}}
       />
     </div>
   );
