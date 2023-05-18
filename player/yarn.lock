@@ -7633,10 +7633,9 @@ react-scripts@5.0.1:
   optionalDependencies:
     fsevents "^2.3.2"
 
-react-video-player-extended@^9.0.0:
+"react-video-player-extended@https://github.com/2banana/react-video-player-extended":
   version "9.0.0"
-  resolved "https://registry.yarnpkg.com/react-video-player-extended/-/react-video-player-extended-9.0.0.tgz#1c0eda6a5a6f384c3eeefb75f4e0d38fcfa20f06"
-  integrity sha512-qhqX+nxyEce4GzgdIg+zGdE8dAkLARX16InDi4XFgToATscoHfJHJLODJ0ipvRI2JXJfa4P5P4LWdXeI2dTBQw==
+  resolved "https://github.com/2banana/react-video-player-extended#36ed70b18fdfb10f2718fcd78b8625fa004f98c1"
   dependencies:
     joi "^17.6.0"
 

@@ -1,11 +1,11 @@
 import VideoPlayer from "react-video-player-extended";
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import config from "./config";
 
 function App() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedMarker, setSelectedMarker] = useState();
+  const [selectedClip, setSelectedClip] = useState();
   const [volume, setVolume] = useState(0.7);
   const [clips, setClips] = useState([]);
   const [addClip, setAddClip] = useState(false);
@@ -14,15 +14,20 @@ function App() {
   const [addClipStartMarker, setAddClipStartMarker] = useState();
   const [addClipEndMarker, setAddClipEndMarker] = useState();
 
-  const controls = [
-    "Play",
-    "Progress",
-    "Time",
-    "Volume",
-    "LastFrame",
-    "NextFrame",
-    "AddMarker",
-  ];
+  const initialControllers = useMemo(
+    () => ["Play", "Progress", "Time", "Volume", "LastFrame", "NextFrame"],
+    []
+  );
+
+  const [controls, setControls] = useState(initialControllers);
+
+  useEffect(() => {
+    if (addClip) {
+      setControls([...initialControllers, "AddMarker"]);
+    } else {
+      setControls(initialControllers);
+    }
+  }, [addClip, initialControllers]);
 
   const onPlay = () => {
     setIsPlaying(true);
@@ -44,21 +49,71 @@ function App() {
     } else {
       setAddClipEndMarker(marker);
     }
+  };
+
+  useEffect(() => {
+    if (addClipStartMarker && !addClipEndMarker) {
+      setMarkers([addClipStartMarker]);
+    }
     if (addClipStartMarker && addClipEndMarker) {
       setMarkers([addClipStartMarker, addClipEndMarker]);
     }
-  };
+  }, [addClipStartMarker, addClipEndMarker]);
 
-  const onMarkerClick = (marker) => {
-    setSelectedMarker({
-      ...marker,
-      // To restart the timer on more than one click
-      time: marker?.time + Math.random() / 1000000,
-    });
+  const onClearAddOrEditClip = () => {
+    if (markers.length) {
+      setAddClipStartMarker(null);
+      setAddClipEndMarker(null);
+      setMarkers([]);
+    }
   };
 
   const onToggleAddClip = () => {
-    setAddClip((preState) => !preState);
+    setAddClip((preState) => {
+      onClearAddOrEditClip();
+      return !preState;
+    });
+  };
+
+  const onSaveClip = () => {
+    if (addClipStartMarker && addClipEndMarker) {
+      setClips([
+        ...clips,
+        { start: addClipStartMarker, end: addClipEndMarker },
+      ]);
+
+      onToggleAddClip();
+    } else {
+      alert("Clip is not valid");
+    }
+  };
+
+  const onPlayClip = (clip) => {
+    setSelectedClip({
+      ...clip,
+      start: {
+        ...clip?.start,
+        time: clip?.start?.time + Math.random() / 1000000,
+      },
+    });
+    setIsPlaying(true);
+    setMarkers([clip?.start, clip?.end]);
+  };
+
+  const onClearSelectedClip = () => {
+    setSelectedClip(null);
+    setMarkers([]);
+  };
+
+  const selectedClipRef = useRef(null);
+  selectedClipRef.current = selectedClip;
+  const onProgress = (_, props) => {
+    if (
+      selectedClipRef.current &&
+      !!(props?.currentTime >= selectedClipRef.current?.end?.time)
+    ) {
+      setIsPlaying(false);
+    }
   };
 
   return (
@@ -70,18 +125,19 @@ function App() {
         onPlay={onPlay}
         onPause={onPause}
         onVolume={onVolume}
-        onProgress={() => {}}
+        onProgress={onProgress}
         controls={controls}
         markers={markers}
         onMarkerAdded={onMarkerAdded}
-        selectedMarker={selectedMarker}
-        onMarkerClick={onMarkerClick}
-        timeStart={selectedMarker?.time}
+        timeStart={selectedClip?.start?.time}
       />
       {addClip ? (
         <button onClick={onToggleAddClip}>Cancel</button>
       ) : (
         <button onClick={onToggleAddClip}>Add Clip</button>
+      )}
+      {selectedClip && (
+        <button onClick={onClearSelectedClip}>Clear clip markers</button>
       )}
       {addClip && (
         <>
@@ -91,23 +147,29 @@ function App() {
             <option value="main">Main</option>
             <option value="end">End</option>
           </select>
-          <label>{addClipStartMarker?.time || "Start Time"}</label>
-          <label>{addClipEndMarker?.time || "End Time"}</label>
-          <button>Save</button>
+          <label>{"Start Time"}</label>
+          <input
+            onChange={() => {}}
+            type="number"
+            value={addClipStartMarker?.time || 0}
+          />
+          <label> to </label>
+          <label>{"End Time"}</label>
+          <input
+            onChange={() => {}}
+            type="number"
+            value={addClipEndMarker?.time || 0}
+          />
+          <button onClick={onSaveClip}>Save</button>
+          <button onClick={onClearAddOrEditClip}>Clear</button>
         </>
       )}
-
-      {clips.map((marker) => {
+      {clips.map((clip) => {
         return (
-          <button
-            onClick={() => {
-              onMarkerClick(marker);
-              setIsPlaying(true);
-            }}
-            key={marker.id}
-          >
-            {marker.id}
-          </button>
+          <div key={clip?.start?.id}>
+            <label>{clip?.start?.time + " to " + clip?.end?.time}</label>
+            <button onClick={() => onPlayClip(clip)}>Play clip</button>
+          </div>
         );
       })}
       <div>{JSON.stringify(clips)}</div>
