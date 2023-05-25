@@ -1,0 +1,26 @@
+.main-container {
+  position: relative;
+  display: flex;
+  width: 90%;
+  max-width: 1200px;
+}
+
+.video {
+  width: 100%;
+}
+
+.video-controls-container {
+  display: flex;
+  position: absolute;
+  width: 100%;
+  height: 40px;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  gap: 0.5rem;
+}
+
+.video-control-icon {
+  color: white;
+  cursor: pointer;
+}
