@@ -7,14 +7,18 @@ import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 import Slider from "@mui/material/Slider";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
 
 const VideoPlayer = () => {
+  const videoPlayerContainerRef = useRef();
   const videoPlayerRef = useRef();
   const [isPlaying, setIsPlaying] = useState(false);
   const [volumeLevel, setVolumeLevel] = useState("high");
   const [volume, setVolume] = useState(100);
   const [currentTime, setCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const togglePlayPauseVideo = useCallback(() => {
     if (isPlaying) {
@@ -40,9 +44,12 @@ const VideoPlayer = () => {
 
   const onKeyDown = useCallback(
     (e) => {
+      const tagName = document.activeElement.tagName.toLowerCase();
+      if (tagName === "input") return;
       const key = e.key.toLowerCase();
       switch (key) {
         case " ":
+          if (tagName === "button") return;
           togglePlayPauseVideo();
           return;
         case "m":
@@ -104,8 +111,21 @@ const VideoPlayer = () => {
     )}:${leadingZeroFormatter.format(seconds)}`;
   }
 
+  function toggleFullScreenMode() {
+    if (document.fullscreenElement == null) {
+      setIsFullScreen(true);
+      videoPlayerContainerRef?.current.requestFullscreen();
+    } else {
+      setIsFullScreen(false);
+      document.exitFullscreen();
+    }
+  }
+
   return (
-    <div className="main-container">
+    <div
+      ref={videoPlayerContainerRef}
+      className={`main-container ${isFullScreen ? "full-screen" : ""}`}
+    >
       <video
         onClick={togglePlayPauseVideo}
         onPlay={onPlayState}
@@ -117,48 +137,66 @@ const VideoPlayer = () => {
         onLoadedData={onLoadedData}
       />
       <div className="video-controls-container">
-        <div className="play-pause-container">
-          {isPlaying ? (
-            <PauseIcon
-              onClick={togglePlayPauseVideo}
-              className="video-control-icon"
+        <div className="left">
+          <div className="play-pause-container">
+            {isPlaying ? (
+              // To make it interact with tab, we need to make it as button
+              <PauseIcon
+                onClick={togglePlayPauseVideo}
+                className="video-control-icon"
+              />
+            ) : (
+              <PlayArrowIcon
+                onClick={togglePlayPauseVideo}
+                className="video-control-icon"
+              />
+            )}
+          </div>
+          <div className="volume-container">
+            {volumeLevel === "high" ? (
+              <VolumeUpIcon
+                onClick={toggleMuteUnMuteVideo}
+                className="video-control-icon"
+              />
+            ) : volumeLevel === "low" ? (
+              <VolumeDownIcon
+                onClick={toggleMuteUnMuteVideo}
+                className="video-control-icon"
+              />
+            ) : (
+              <VolumeOffIcon
+                onClick={toggleMuteUnMuteVideo}
+                className="video-control-icon"
+              />
+            )}
+            <Slider
+              value={volume}
+              onChange={(_, value) => {
+                onSliderValueChange(value);
+              }}
+              className="volume-slider"
             />
-          ) : (
-            <PlayArrowIcon
-              onClick={togglePlayPauseVideo}
-              className="video-control-icon"
-            />
-          )}
+          </div>
+          <div className="duration-info">
+            <span>{formatDuration(currentTime)}</span>
+            <span>/</span>
+            <span>{formatDuration(videoDuration)}</span>
+          </div>
         </div>
-        <div className="volume-container">
-          {volumeLevel === "high" ? (
-            <VolumeUpIcon
-              onClick={toggleMuteUnMuteVideo}
-              className="video-control-icon"
-            />
-          ) : volumeLevel === "low" ? (
-            <VolumeDownIcon
-              onClick={toggleMuteUnMuteVideo}
-              className="video-control-icon"
-            />
-          ) : (
-            <VolumeOffIcon
-              onClick={toggleMuteUnMuteVideo}
-              className="video-control-icon"
-            />
-          )}
-          <Slider
-            value={volume}
-            onChange={(_, value) => {
-              onSliderValueChange(value);
-            }}
-            className="volume-slider"
-          />
-        </div>
-        <div className="duration-info">
-          <span>{formatDuration(currentTime)}</span>
-          <span>/</span>
-          <span>{formatDuration(videoDuration)}</span>
+        <div className="left">
+          <div className="full-screen-container">
+            {isFullScreen ? (
+              <FullscreenExitIcon
+                onClick={toggleFullScreenMode}
+                className="video-control-icon"
+              />
+            ) : (
+              <FullscreenIcon
+                onClick={toggleFullScreenMode}
+                className="video-control-icon"
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

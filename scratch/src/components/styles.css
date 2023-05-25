@@ -3,6 +3,17 @@
   display: flex;
   width: 90%;
   max-width: 1200px;
+  background-color: black;
+}
+
+.main-container.full-screen,
+.main-container.theater {
+  width: 100%;
+  max-width: initial;
+}
+
+.main-container.theater {
+  max-height: 90vh;
 }
 
 .video {
@@ -17,8 +28,21 @@
   bottom: 0;
   right: 0;
   left: 0;
-  gap: 0.5rem;
   align-items: center;
+  justify-content: space-between;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.video-controls-container .left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.video-controls-container .right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .video-control-icon {
