@@ -6,10 +6,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeDownIcon from "@mui/icons-material/VolumeDown";
+import Slider from "@mui/material/Slider";
+
 const VideoPlayer = () => {
   const videoPlayerRef = useRef();
   const [isPlaying, setIsPlaying] = useState(false);
   const [volumeLevel, setVolumeLevel] = useState("high");
+  const [volume, setVolume] = useState(100);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
 
   const togglePlayPauseVideo = useCallback(() => {
     if (isPlaying) {
@@ -42,6 +47,7 @@ const VideoPlayer = () => {
           return;
         case "m":
           toggleMuteUnMuteVideo();
+          return;
         default:
           return;
       }
@@ -49,12 +55,20 @@ const VideoPlayer = () => {
     [togglePlayPauseVideo]
   );
 
+  const onSliderValueChange = (value) => {
+    setVolume(value);
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.volume = value / 100;
+    }
+  };
+
   useEffect(() => {
+    const videoPlayer = videoPlayerRef.current;
     document.addEventListener("keydown", onKeyDown);
-    videoPlayerRef.current.addEventListener("volumechange", () => {
-      if (videoPlayerRef.current.muted || videoPlayerRef.current.volume === 0) {
+    videoPlayer.addEventListener("volumechange", () => {
+      if (videoPlayer.muted || videoPlayer.volume === 0) {
         setVolumeLevel("muted");
-      } else if (videoPlayerRef.current.volume >= 0.5) {
+      } else if (videoPlayer.volume >= 0.5) {
         setVolumeLevel("high");
       } else {
         setVolumeLevel("low");
@@ -62,8 +76,33 @@ const VideoPlayer = () => {
     });
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+      videoPlayer.removeEventListener("volumechange", onKeyDown);
     };
   }, [onKeyDown]);
+
+  const onTimeUpdate = () => {
+    setCurrentTime(videoPlayerRef?.current?.currentTime);
+  };
+
+  const onLoadedData = () => {
+    setVideoDuration(videoPlayerRef?.current?.duration);
+  };
+
+  const leadingZeroFormatter = new Intl.NumberFormat(undefined, {
+    minimumIntegerDigits: 2,
+  });
+
+  function formatDuration(time) {
+    const seconds = Math.floor(time % 60);
+    const minutes = Math.floor(time / 60) % 60;
+    const hours = Math.floor(time / (60 * 60));
+    if (hours === 0) {
+      return `${minutes}:${leadingZeroFormatter.format(seconds)}`;
+    }
+    return `${hours}:${leadingZeroFormatter.format(
+      minutes
+    )}:${leadingZeroFormatter.format(seconds)}`;
+  }
 
   return (
     <div className="main-container">
@@ -74,6 +113,8 @@ const VideoPlayer = () => {
         ref={videoPlayerRef}
         className="video"
         src={video}
+        onTimeUpdate={onTimeUpdate}
+        onLoadedData={onLoadedData}
       />
       <div className="video-controls-container">
         <div className="play-pause-container">
@@ -89,7 +130,7 @@ const VideoPlayer = () => {
             />
           )}
         </div>
-        <div>
+        <div className="volume-container">
           {volumeLevel === "high" ? (
             <VolumeUpIcon
               onClick={toggleMuteUnMuteVideo}
@@ -106,6 +147,18 @@ const VideoPlayer = () => {
               className="video-control-icon"
             />
           )}
+          <Slider
+            value={volume}
+            onChange={(_, value) => {
+              onSliderValueChange(value);
+            }}
+            className="volume-slider"
+          />
+        </div>
+        <div className="duration-info">
+          <span>{formatDuration(currentTime)}</span>
+          <span>/</span>
+          <span>{formatDuration(videoDuration)}</span>
         </div>
       </div>
     </div>
