@@ -13,6 +13,9 @@ import FullscreenIcon from "@mui/icons-material/Fullscreen";
 const VideoPlayer = () => {
   const videoPlayerContainerRef = useRef();
   const videoPlayerRef = useRef();
+  const timelineHoverRef = useRef();
+  const timelineProgressRef = useRef();
+  const timelineContainerRef = useRef();
   const [isPlaying, setIsPlaying] = useState(false);
   const [volumeLevel, setVolumeLevel] = useState("high");
   const [volume, setVolume] = useState(100);
@@ -88,7 +91,12 @@ const VideoPlayer = () => {
   }, [onKeyDown]);
 
   const onTimeUpdate = () => {
-    setCurrentTime(videoPlayerRef?.current?.currentTime);
+    const currentTime = videoPlayerRef?.current?.currentTime;
+    setCurrentTime(currentTime);
+    if (timelineProgressRef.current) {
+      timelineProgressRef.current.style.width =
+        (currentTime / videoDuration) * 100 + "%";
+    }
   };
 
   const onLoadedData = () => {
@@ -137,6 +145,31 @@ const VideoPlayer = () => {
         onLoadedData={onLoadedData}
       />
       <div className="video-controls-container">
+        <div ref={timelineContainerRef} className="timeline-container">
+          <div
+            onMouseMove={(e) => {
+              if (timelineHoverRef.current)
+                timelineHoverRef.current.style.width = e.clientX + "px";
+            }}
+            onMouseDown={(e) => {
+              const timelineContainerState =
+                timelineContainerRef.current?.getBoundingClientRect();
+              const width = timelineContainerState.width;
+              const currentPosition = e.clientX;
+              const percent = currentPosition / width;
+              videoPlayerRef.current.currentTime = percent * videoDuration;
+            }}
+            onMouseLeave={(e) => {
+              timelineHoverRef.current.style.width = 0;
+            }}
+            className="timeline"
+          >
+            <div ref={timelineHoverRef} className="timeline-hover"></div>
+            <div ref={timelineProgressRef} className="timeline-progress"></div>
+            <img className="preview-img" />
+            <div className="thumb-indicator"></div>
+          </div>
+        </div>
         <div className="left">
           <div className="play-pause-container">
             {isPlaying ? (

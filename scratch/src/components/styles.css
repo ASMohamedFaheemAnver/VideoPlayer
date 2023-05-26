@@ -83,3 +83,38 @@
   display: flex;
   gap: 0.2rem;
 }
+
+.timeline-container {
+  height: 7px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  top: 0;
+}
+
+.timeline {
+  background-color: rgba(100, 100, 100, 0.5);
+  height: 3px;
+  width: 100%;
+  position: relative;
+}
+
+.timeline-hover {
+  position: absolute;
+  height: 100%;
+  background-color: rgb(150, 150, 150);
+  width: 0;
+}
+
+.timeline-progress {
+  position: absolute;
+  height: 100%;
+  background-color: red;
+  width: 0;
+}
+
+.timeline:hover {
+  height: 100%;
+}
