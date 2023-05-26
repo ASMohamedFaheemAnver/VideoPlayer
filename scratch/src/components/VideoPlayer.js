@@ -10,10 +10,11 @@ import Slider from "@mui/material/Slider";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 
-const VideoPlayer = () => {
+const VideoPlayer = ({ left, size }) => {
   const videoPlayerContainerRef = useRef();
   const videoPlayerRef = useRef();
   const timelineHoverRef = useRef();
+  const timelineClipRef = useRef();
   const timelineProgressRef = useRef();
   const timelineContainerRef = useRef();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -22,6 +23,15 @@ const VideoPlayer = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const maxTime = ((left + size) / 100) * videoDuration;
+
+  useEffect(() => {
+    // if (left) videoPlayerRef.current.currentTime = (left / 100) * videoDuration;
+    if (left && size && timelineClipRef.current) {
+      timelineClipRef.current.style.left = left + "%";
+      timelineClipRef.current.style.width = size + "%";
+    }
+  }, [left, size, videoDuration]);
 
   const togglePlayPauseVideo = useCallback(() => {
     if (isPlaying) {
@@ -92,6 +102,9 @@ const VideoPlayer = () => {
 
   const onTimeUpdate = () => {
     const currentTime = videoPlayerRef?.current?.currentTime;
+    if (maxTime && currentTime > maxTime) {
+      togglePlayPauseVideo();
+    }
     setCurrentTime(currentTime);
     if (timelineProgressRef.current) {
       timelineProgressRef.current.style.width =
@@ -165,6 +178,7 @@ const VideoPlayer = () => {
             className="timeline"
           >
             <div ref={timelineHoverRef} className="timeline-hover"></div>
+            <div ref={timelineClipRef} className="timeline-clip"></div>
             <div ref={timelineProgressRef} className="timeline-progress"></div>
             <img className="preview-img" />
             <div className="thumb-indicator"></div>

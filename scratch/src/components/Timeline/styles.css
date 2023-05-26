@@ -1,0 +1,57 @@
+.time-span {
+  position: absolute;
+  background-color: black;
+  width: 1%;
+  height: 40px;
+  cursor: pointer;
+  min-width: 1px;
+}
+.resizer {
+  position: absolute;
+  background-color: white;
+  width: 2px;
+  height: 100%;
+}
+
+.resizer.left {
+  background-color: transparent;
+  cursor: w-resize;
+  left: -2px;
+}
+
+.resizer.right {
+  right: 0;
+  background-color: transparent;
+  cursor: e-resize;
+  right: -2px;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress {
+  height: 20px;
+  width: 100%;
+  background-color: red;
+}
+
+.clip {
+  width: 0px;
+  height: 100%;
+  background-color: gray;
+  position: relative;
+}
+
+.main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 1200px;
+  height: 40px;
+  background-color: green;
+  top: 20px;
+}

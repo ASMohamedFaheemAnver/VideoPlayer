@@ -108,6 +108,12 @@
   width: 0;
 }
 
+.timeline-clip {
+  position: absolute;
+  height: 100%;
+  background-color: green;
+}
+
 .timeline-progress {
   position: absolute;
   height: 100%;
